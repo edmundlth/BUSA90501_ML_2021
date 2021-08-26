@@ -1,6 +1,11 @@
 
 # Summary based on interactions in class
 ----
+Hopefully this helps with revision....
+
+<font color=red>
+Unfortunately, github markdown doesn't render equation written in latex, I've made a copy of the following in <a href="./summary.ipynb"> summary.ipynb </a> with math notataions rendered.
+</font>
 
 # Bagging vs Boosting
 There were some confusion regarding the similarities and differences. 
