@@ -30,6 +30,8 @@ This is reverse-mode autidifferentiation (a.k.a. backpropagation).
 
 ### Quicknote on autodifferentiation
 **Reverse mode**  
+https://rufflewind.com/2016-12-30/reverse-mode-automatic-differentiation
+
 If you start expanding partial derivative going from top to bottom (i.e. going from outside-in in term of function composition), then you will be doing reverse mode autodifferentiation with respect to the network inputs. Explicitly, 
 
 $$

@@ -12,6 +12,7 @@ matplotlib = "*"
 scipy = "*"
 seaborn = "*"
 plotly = "*"
+xgboost = "*"
 
 [dev-packages]
 
