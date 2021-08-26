@@ -35,6 +35,14 @@ Differences:
 | Objective function in each iteration | Does not change. But do note that the objective function is taking average of a changing dataset every iteration | Changes every iteration since it includes the size of error made on each training sample in previous iteration. |
 
 
+**Details for Adaboost**
+TODO....
+
+**Details for XGBoost**
+TODO.... 
+
+
+
 ----
 
 # Some common themes in machine learning
