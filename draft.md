@@ -54,3 +54,38 @@ where $a^l_i = \sum_j W^{(l)}_{ij} h^l_j$ being the affine transformation in eac
 
 
 But we don't really care about gradient with respect to network inputs do we? What we want is the gradient with respect to the **network parameters** to do parameter optimisation. We use the same top-down chain rule expansion
+
+
+
+
+**Adaboost details**
+
+**Input**: 
+ - A fixed class of base learner $f$ that we know how to train. Decision tree for example.
+ - Data set of size $N$, $D_N = \{(x_1, y_1), \dots, (x_i, y_i), \dots, (x_N, y_N)\}$. We only consider binary classification here so $y_i \in \{-1, +1\}$
+ - Total number $T$ of learners. 
+ - A (training) loss function, we use exponential loss: $L(F) = \sum_{i = 1}^N e^{-y_i F(x_i)}$. Notice that if $F(x_i)$ and $y_i$ has the same sign (correct classification), we get a $e^{-1}$ term (small), but if they are not the same sign (wrong classfication), we get $e^{+1}$ (big). 
+ - Size of the training data for the base learners: $m$. (make this $m = N$ if you wish)
+
+**Output**:
+A function $F$ given by the sum of the $T$ base learners:  $F = f_1 + f_2 + \dots + f_T$. 
+
+**Initialise**: 
+ * Let $p_t(i)$ be the probability of sampling data point $(x_i, y_i)$ at iteration $t$. Initialise $p_1(i) = 1/N$, i.e. all $N$ samples are equaly likely to be drawn. 
+ * Let $F_t(x) = f_1 + \dots + f_t$ be the classifier at iteration $t$. And set $F_1 = f_1$ where $f_1$ is a single decision tree fitted to the training data. 
+
+**Iterations**:
+For $t = 1 \dots T$
+ * **Draw new dataset** Draw $m$ samples from the training dataset according to $p_t$ to form the base learner training set $D^{base}_m$ of size $m$. (see [inverse transform sampling](https://en.wikipedia.org/wiki/Inverse_transform_sampling) or use `scipy.stats.rv_discrete` for Python implementation). 
+   <details> 
+   <summary> Main idea for sampling (see python code below in notebook): </summary>
+   * Compute cummulative distribution $[0, CDF(1), CDF(2),\dots , CDF(N)]$ from the density $[p_t(1), \dots, p_t(N)]$, meaning $CDF(i) = p_t(1) + \dots + p_t(i)$. 
+   * Generate a number uniformly at random from the unit interval, $u ~ U([0, 1])$. 
+   * Find index $k$ such that $CDF(k - 1) \lt u \leq CDF(k)$. 
+   * include $x_k$ in the list of samples. 
+   * Do this $m$ times to get $m$ samples
+  <details>
+ * **Compute error made by last iteration**: $\epsilon_t = \sum_{i = 1}^m p_t(i)
+ * **Train base learner**: We split $f_t = w_t \text{DecisionTree}_t$. Train the decision tree on the newly drawn dataset $D^{base}_m$. And compute the weight 
+ * **Update sample distribution**: 
+

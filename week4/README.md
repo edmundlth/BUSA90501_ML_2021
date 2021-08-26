@@ -1,5 +1,5 @@
 
-# Summary based on interactions in class
+# After class summary...
 ----
 Hopefully this helps with revision....
 
@@ -25,15 +25,15 @@ Both falls under **ensemble method**. Meaning, both consist of
 
 
 ## Adaboost vs XGBoost
-Similarities: 
+**Similarities:** 
  * Both are boosting algorithms. 
  * Both can be done using arbitrary base learners. But they are frequently discussed / applied in the context where the base learners are decision trees. 
  * Both aim to train a final classifier which is a sum of base classifiers $F(x) = \sum_t f_t(x) = f_1(x) + f_2(x) + \dots + f_T(x)$. (let's forget about the weights for now, later we can always do $f_t(x) = w_tf_t(x)$). 
- * Both are trained iteratively with a new $f_t$ being trained based on what the **combination** of previous (already trained) learners, $F_{t-1} = f_1 + f_2 + \dots + f_{t -1}$, thinks is difficult. 
+ * Both are trained iteratively with a new $f_t$ being trained based on what the **combination** of previous (already trained) learners, $F_{t-1} = f_1 + f_2 + \dots + f_{t -1}$, thinks is difficult. So that at iteration $t$, the ensemble will look like $F_t = F_{t -1} + f_t = f_1 + f_2 + \dots + f_{t}$. And we stop at a chosen $T$ generation, giving the overall classifier $F = F_T = f_1 + f_2 + \dots + f_{T}$. 
  * Both aim to minimise a training loss $L(F)$ (like most machine learning algorithms). And lets only focus on square loss $L(f) = \sum_i (F(x_i) - y_i)^2$ and forget the regularisation term for a moment. 
 
 
-Differences: 
+**Differences:**
 | | Adaboost | XGBoost |
 | :--- | :---: | :---: |
 | Training data in each iteration | A **new** training set is sampled (with replacement) every iteration with a **changing** distribution $D_t$ that makes training samples incorrectly classified by previous iteration more likely to be sampled | Just use the whole dataset in every iteration | 
@@ -41,7 +41,7 @@ Differences:
 
 
 **Details for Adaboost**
-TODO....
+TODO...
 
 **Details for XGBoost**
 TODO.... 
@@ -87,6 +87,7 @@ For example:
  * $y=$ whether or not it rains and $x$ is cloudiness. So we have one continuous features and one binary output. 
  * $y=$ whether or not it rains and $x$ is cloudiness and whether it rained yesterday. We have one binary output, one continuous feature and one binary feature. 
  * $y=$ probability of rain and $x$ is temperature and cloudiness. We have a continuous output and two dimensional continuous inputs. 
+ * 
 
 
 
@@ -137,6 +138,7 @@ L(\hat{f}_\theta) = L(\theta) = \sum_i (y_i - \hat{f}_\theta(x))^2
 $$
 
 
+
 ## Training / fitting
 With what we have set up above, training a model translate to 
 > Find the best parameter $\theta$ that minimises **training** loss $L(\theta)$. 
@@ -146,6 +148,7 @@ This becomes purely a problem in **optimisation**.
 ## Testing and generalisation error
 Once a good parameter and therefore a good $\hat{f}$ is found, we can ask 
 > "Ok, so I know that $\theta$ do well in my dataset, but how do I know that it will do well in the real world?"
+
 Ideally we can just compare $\hat{f}_\theta$ against the truth $f$ and account for all possible value of $x$ (by taking expectation for example)
 $$
 L(\hat{f}) = \sum_{\text{all possible values of $x$}} (\hat{f}_\theta(x) - f(x))^2 dx
@@ -160,5 +163,53 @@ The hope is that the performance measure generated with these methods will be a 
 
 
 
+----
+# Demo implementation of how to do sampling with replacement using different probability density
+
+```python
+import numpy as np
+
+def sample_one(probabilities):
+    """
+    Generate a single sample with probability density specified by
+      `probabilities = [p1, p2, ..., pN]`
+    We will return an index `i` between 0 and N-1 inclusive.
+    """
+    assert np.sum(probabilities) # just checking this is an honest probability density
+    
+    N = len(probabilities) # size of the sample space
+    cummulative_density = np.cumsum(probabilities) # compute CDF
+    cummulative_density = np.concatenate([[0], cummulative_density]) # prepend 0 to the list
+    random_seed = np.random.rand() # generate a single random number between 0 and 1 uniformly.
+    
+    # Look for the index i such that CDF[i -1] <= random_seed <= CDF[i]
+    for i in range(N):
+        if cummulative_density[i] < random_seed <= cummulative_density[i + 1]:
+            return i # break and return when found
+    #return N -1 # if loop complete it must have fall on the last interval
 
 
+def sample(n, items, probabilities):
+    """For pedagogy only. Inefficient implementation"""
+    samples = []
+    for _ in range(n):
+        index = sample_one(probabilities)
+        samples.append(items[index])
+    return samples
+
+
+items = ['a', 'b', 'c', 'd']
+probabilities = [1/8, 1/8, 4/8, 2/8]
+num_samples = 10000
+samples = sample(num_samples, items, probabilities)
+
+print(f"Empirical probabilities:")
+a, b = np.unique(samples,  return_counts=True)
+for a, b in zip(*np.unique(samples,  return_counts=True)):
+    print(f"Probability of oberving {a} = {b / num_samples}")
+Empirical probabilities:
+Probability of oberving a = 0.1208
+Probability of oberving b = 0.1248
+Probability of oberving c = 0.505
+Probability of oberving d = 0.2494
+```
